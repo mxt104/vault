@@ -1,0 +1,26 @@
+from ftplib import FTP
+
+ftp = FTP()
+
+# Connect to server
+ftp.connect("127.0.0.1", 2121)
+
+# Login
+ftp.login("Dev", "12345")
+
+print("Files in Server Directory:")
+ftp.retrlines("LIST")
+
+# Upload file
+with open("sample.txt", "rb") as file:
+    ftp.storbinary("STOR sample.txt", file)
+
+print("File uploaded successfully.")
+
+# Download file
+with open("downloaded_sample.txt", "wb") as file:
+    ftp.retrbinary("RETR sample.txt", file.write)
+
+print("File downloaded successfully.")
+
+ftp.quit()
