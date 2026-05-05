@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Practicals - Final Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c12;
+    --surface: #0f1520;
+    --surface2: #161f2e;
+    --border: #1e2d42;
+    --accent: #00d4aa;
+    --text: #cdd6f4;
+    --muted: #6b7a99;
+    --title: #ffffff;
+    --code-bg: #010409;
+    --code-color: #a6e3a1;
+  }
+
+  body.light {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface2: #e8ecf2;
+    --border: #d0d7e3;
+    --accent: #009977;
+    --text: #1e2a3a;
+    --muted: #7a8799;
+    --title: #0d1b2a;
+    --code-bg: #f0f4f8;
+    --code-color: #1a7a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px;
+    max-width: 860px;
+    margin: 0 auto;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  /* Theme Toggle */
+  .top-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 5px;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .theme-btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .theme-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--title);
+    margin-bottom: 4px;
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+
+  .section { margin-bottom: 40px; }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--title);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title .badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: auto;
+  }
+
+  .cmd-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .cmd-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  .cmd-row .num {
+    color: var(--muted);
+    font-size: 11px;
+    min-width: 18px;
+    text-align: right;
+  }
+
+  .script-entry {
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+  }
+
+  .script-label {
+    display: flex;
+    align-items: center;
+    padding: 9px 14px;
+    background: var(--surface2);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+  }
+
+  .script-label .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 22px;
+  }
+
+  .script-label .name { flex: 1; }
+
+  .script-label .arrow {
+    font-size: 11px;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  .script-label.open .arrow { transform: rotate(90deg); }
+
+  .copy-btn {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: rgba(0,212,170,0.08); }
+
+  .script-code { display: none; background: var(--code-bg); border-top: 1px solid var(--border); }
+
+  .script-code pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--code-color);
+    padding: 14px 18px;
+    line-height: 1.75;
+    overflow-x: auto;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="page-title">🐧 Linux Practicals</div>
+  <div class="theme-toggle">
+    <button class="theme-btn active" id="btn-dark" onclick="setTheme('dark')">🌙 Dark</button>
+    <button class="theme-btn" id="btn-light" onclick="setTheme('light')">☀️ Light</button>
+  </div>
+</div>
+<div class="page-sub">Final Exam Reference — All practicals listed</div>
+
+<!-- P2 -->
+<div class="section">
+  <div class="section-title">P2 — General Purpose Commands <span class="badge">10 cmds</span></div>
+  <div class="cmd-list">
+    <div class="cmd-row"><span class="num">1</span>pwd</div>
+    <div class="cmd-row"><span class="num">2</span>ls</div>
+    <div class="cmd-row"><span class="num">3</span>cd</div>
+    <div class="cmd-row"><span class="num">4</span>mkdir</div>
+    <div class="cmd-row"><span class="num">5</span>touch</div>
+    <div class="cmd-row"><span class="num">6</span>cat</div>
+    <div class="cmd-row"><span class="num">7</span>cp</div>
+    <div class="cmd-row"><span class="num">8</span>mv</div>
+    <div class="cmd-row"><span class="num">9</span>rm</div>
+    <div class="cmd-row"><span class="num">10</span>echo</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P3 -->
+<div class="section">
+  <div class="section-title">P3 — File Management Commands <span class="badge">10 cmds</span></div>
+  <div class="cmd-list">
+    <div class="cmd-row"><span class="num">1</span>ls</div>
+    <div class="cmd-row"><span class="num">2</span>cd</div>
+    <div class="cmd-row"><span class="num">3</span>pwd</div>
+    <div class="cmd-row"><span class="num">4</span>cat</div>
+    <div class="cmd-row"><span class="num">5</span>mkdir</div>
+    <div class="cmd-row"><span class="num">6</span>rmdir</div>
+    <div class="cmd-row"><span class="num">7</span>rm</div>
+    <div class="cmd-row"><span class="num">8</span>cp</div>
+    <div class="cmd-row"><span class="num">9</span>mv</div>
+    <div class="cmd-row"><span class="num">10</span>chmod</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P4 -->
+<div class="section">
+  <div class="section-title">P4 — User Management Commands <span class="badge">10 cmds</span></div>
+  <div class="cmd-list">
+    <div class="cmd-row"><span class="num">1</span>useradd</div>
+    <div class="cmd-row"><span class="num">2</span>passwd</div>
+    <div class="cmd-row"><span class="num">3</span>who</div>
+    <div class="cmd-row"><span class="num">4</span>whoami</div>
+    <div class="cmd-row"><span class="num">5</span>su</div>
+    <div class="cmd-row"><span class="num">6</span>sudo</div>
+    <div class="cmd-row"><span class="num">7</span>userdel</div>
+    <div class="cmd-row"><span class="num">8</span>groupadd</div>
+    <div class="cmd-row"><span class="num">9</span>groupdel</div>
+    <div class="cmd-row"><span class="num">10</span>chown</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P5 -->
+<div class="section">
+  <div class="section-title">P5 — Process &amp; Memory Commands <span class="badge">10 cmds</span></div>
+  <div class="cmd-list">
+    <div class="cmd-row"><span class="num">1</span>ps</div>
+    <div class="cmd-row"><span class="num">2</span>ps aux</div>
+    <div class="cmd-row"><span class="num">3</span>pstree</div>
+    <div class="cmd-row"><span class="num">4</span>pgrep</div>
+    <div class="cmd-row"><span class="num">5</span>kill</div>
+    <div class="cmd-row"><span class="num">6</span>top</div>
+    <div class="cmd-row"><span class="num">7</span>htop</div>
+    <div class="cmd-row"><span class="num">8</span>free</div>
+    <div class="cmd-row"><span class="num">9</span>vmstat</div>
+    <div class="cmd-row"><span class="num">10</span>df</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P6 -->
+<div class="section">
+  <div class="section-title">P6 — Networking Commands <span class="badge">10 cmds</span></div>
+  <div class="cmd-list">
+    <div class="cmd-row"><span class="num">1</span>ifconfig</div>
+    <div class="cmd-row"><span class="num">2</span>ip</div>
+    <div class="cmd-row"><span class="num">3</span>ping</div>
+    <div class="cmd-row"><span class="num">4</span>traceroute</div>
+    <div class="cmd-row"><span class="num">5</span>netstat</div>
+    <div class="cmd-row"><span class="num">6</span>nslookup</div>
+    <div class="cmd-row"><span class="num">7</span>dig</div>
+    <div class="cmd-row"><span class="num">8</span>curl</div>
+    <div class="cmd-row"><span class="num">9</span>wget</div>
+    <div class="cmd-row"><span class="num">10</span>telnet</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P7 -->
+<div class="section">
+  <div class="section-title">P7 — Shell Scripts <span class="badge">10 programs</span></div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">1</span><span class="name">Hello World Program</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_1',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_1">#!/bin/bash
+echo "first shell"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">2</span><span class="name">Addition of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_2',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_2">#!/bin/bash
+echo "enter the 1st number"
+read n
+echo "enter the 2nd number"
+read m
+sum=$((n+m))
+echo "entered number sum is $sum"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">3</span><span class="name">Multiplication of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_3',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_3">#!/bin/bash
+echo "enter the 1st number"
+read n
+echo "enter the 2nd number"
+read m
+mul=$((n*m))
+echo "multiplication is $mul"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">4</span><span class="name">Division of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_4',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_4">#!/bin/bash
+echo "enter the 1st number"
+read n
+echo "enter the 2nd number"
+read m
+div=$((n/m))
+echo "division of $n and $m is $div"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">5</span><span class="name">Check Odd or Even</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_5',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_5">#!/bin/bash
+echo "enter the number"
+read n
+if [ $((n%2)) -eq 0 ]
+then
+    echo "$n is even"
+else
+    echo "$n is odd"
+fi</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">6</span><span class="name">Check Prime Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_6',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_6">#!/bin/bash
+echo "enter number"
+read n
+if [ $n -le 1 ]
+then
+    echo "$n is not a prime number"
+    exit
+fi
+
+i=2
+while [ $i -lt $n ]
+do
+    if [ $((n%i)) -eq 0 ]
+    then
+        echo "$n is not a prime number"
+        exit
+    fi
+    i=$((i+1))
+done
+
+echo "$n is a prime number"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">7</span><span class="name">Leap Year Check</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_7',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_7">#!/bin/bash
+echo "enter the year"
+read n
+if [ $((n%4)) -eq 0 ]
+then
+    echo "$n is leap year"
+else
+    echo "$n is not a leap year"
+fi</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">8</span><span class="name">Factorial of a Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_8',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_8">#!/bin/bash
+echo "enter the number"
+read n
+fact=1
+
+while [ $n -ge 1 ]
+do
+    fact=$((fact*n))
+    n=$((n-1))
+done
+
+echo "factorial is $fact"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">9</span><span class="name">Armstrong Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_9',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_9">#!/bin/bash
+echo "enter a number"
+read n
+
+original=$n
+sum=0
+
+while [ $n -gt 0 ]
+do
+    digit=$((n%10))
+    sum=$((sum + digit*digit*digit))
+    n=$((n/10))
+done
+
+if [ $sum -eq $original ]
+then
+    echo "armstrong number"
+else
+    echo "not armstrong"
+fi</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">10</span><span class="name">Largest of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p7_10',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p7_10">#!/bin/bash
+echo "enter number 1"
+read n
+echo "enter number 2"
+read m
+
+if [ $n -gt $m ]
+then
+    echo "$n is largest"
+else
+    echo "$m is largest"
+fi</pre></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P8 -->
+<div class="section">
+  <div class="section-title">P8 — Advanced Shell Scripts <span class="badge">7 programs</span></div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">1</span><span class="name">Display Logged-in Users</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_1',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_1">#!/bin/bash
+echo "logged in user details"
+who -u
+echo "total users:"
+who | wc -l</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">2</span><span class="name">Check File or Directory</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_2',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_2">#!/bin/bash
+echo "enter name"
+read val
+
+if [ -d "$val" ]
+then
+    echo "directory"
+elif [ -f "$val" ]
+then
+    echo "file"
+else
+    echo "invalid"
+fi</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">3</span><span class="name">Create Directory</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_3',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_3">#!/bin/bash
+echo "enter directory name"
+read d
+
+if [ ! -d "$d" ]
+then
+    mkdir "$d"
+    echo "directory created"
+else
+    echo "directory exists"
+fi</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">4</span><span class="name">Create File in Directory</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_4',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_4">#!/bin/bash
+echo "enter directory name"
+read d
+
+mkdir -p "$d"
+
+echo "enter file name"
+read f
+
+touch "$d/$f"
+echo "file created"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">5</span><span class="name">Add Content into File</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_5',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_5">#!/bin/bash
+echo "enter directory name"
+read d
+
+mkdir -p "$d"
+
+echo "enter file name"
+read f
+
+touch "$d/$f"
+
+echo "enter content"
+read content
+
+echo "$content" >> "$d/$f"
+echo "content added"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">6</span><span class="name">Copy File to Another Directory</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_6',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_6">#!/bin/bash
+echo "enter source directory"
+read s
+
+echo "enter file name"
+read f
+
+echo "enter destination directory"
+read d
+
+mkdir -p "$d"
+
+cp "$s/$f" "$d/"
+echo "file copied"</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">7</span><span class="name">Count Files &amp; Directories</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p8_7',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p8_7">#!/bin/bash
+echo "enter directory"
+read d
+
+files=$(find "$d" -type f | wc -l)
+dirs=$(find "$d" -type d | wc -l)
+
+echo "files: $files"
+echo "directories: $dirs"
+echo "total: $((files+dirs))"</pre></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P9 -->
+<div class="section">
+  <div class="section-title">P9 — Perl Programs <span class="badge">5 programs</span></div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">1</span><span class="name">Read Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p9_1',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p9_1">#!/usr/bin/perl
+print "Enter number:";
+$n = <>;
+print "Entered number is $n";</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">2</span><span class="name">Addition of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p9_2',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p9_2">#!/usr/bin/perl
+print "Enter number1:";
+$n1 = <>;
+print "Enter number2:";
+$n2 = <>;
+$sum = $n1 + $n2;
+print "SUM is $sum";</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">3</span><span class="name">Search Element in List</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p9_3',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p9_3">#!/usr/bin/perl
+print "Enter list:";
+@arr = split(' ', <>);
+print "Enter element:";
+$ele = <>;
+
+foreach $i (@arr) {
+    if ($i eq $ele) {
+        print "Element found";
+        exit;
+    }
+}
+print "Not found";</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">4</span><span class="name">Compare Two Strings</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p9_4',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p9_4">#!/usr/bin/perl
+print "Enter string1:";
+$a = <>;
+print "Enter string2:";
+$b = <>;
+
+if ($a eq $b) {
+    print "Equal";
+} else {
+    print "Not equal";
+}</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">5</span><span class="name">Menu Driven Calculator</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p9_5',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p9_5">#!/usr/bin/perl
+print "Enter a:";
+$a = <>;
+print "Enter b:";
+$b = <>;
+
+print "1.Add 2.Sub 3.Mul 4.Div\n";
+$ch = <>;
+
+if ($ch == 1) {
+    print $a + $b;
+} elsif ($ch == 2) {
+    print $a - $b;
+} elsif ($ch == 3) {
+    print $a * $b;
+} elsif ($ch == 4) {
+    print $a / $b;
+} else {
+    print "Invalid";
+}</pre></div>
+  </div>
+</div>
+
+<hr>
+
+<!-- P10 -->
+<div class="section">
+  <div class="section-title">P10 — AWK Programs <span class="badge">3 programs</span></div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">1</span><span class="name">Read and Print Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p10_1',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p10_1">awk 'BEGIN{print "Enter number"; getline n; print n;}'</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">2</span><span class="name">Addition of Two Numbers</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p10_2',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p10_2">awk 'BEGIN{
+print "Enter number1";
+getline a;
+print "Enter number2";
+getline b;
+c=a+b;
+print c;
+}'</pre></div>
+  </div>
+
+  <div class="script-entry">
+    <div class="script-label" onclick="toggle(this)">
+      <span class="num">3</span><span class="name">Factorial of Number</span>
+      <button class="copy-btn" onclick="event.stopPropagation();copyCode('p10_3',this)">Copy</button>
+      <span class="arrow">▶</span>
+    </div>
+    <div class="script-code"><pre id="p10_3">awk 'BEGIN{
+print "Enter number";
+getline n;
+fact=1;
+for(i=1;i<=n;i++){
+fact=fact*i;
+}
+print fact;
+}'</pre></div>
+  </div>
+</div>
+
+<script>
+function setTheme(mode) {
+  if (mode === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('btn-light').classList.add('active');
+    document.getElementById('btn-dark').classList.remove('active');
+  } else {
+    document.body.classList.remove('light');
+    document.getElementById('btn-dark').classList.add('active');
+    document.getElementById('btn-light').classList.remove('active');
+  }
+}
+
+function toggle(label) {
+  const code = label.nextElementSibling;
+  const isOpen = code.style.display === 'block';
+  code.style.display = isOpen ? 'none' : 'block';
+  label.classList.toggle('open', !isOpen);
+}
+
+function copyCode(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  });
+}
+</script>
+</body>
+</html>

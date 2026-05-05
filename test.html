@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux Laboratory - Practical Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --surface: #0f0f12;
+      --surface-hover: #16161a;
+      --accent: #00f2ff;
+      --accent-glow: rgba(0, 242, 255, 0.3);
+      --text: #e0e0e6;
+      --text-dim: #9494a1;
+      --border: #1f1f23;
+      --code-bg: #000000;
+      --success: #00ff88;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    .container {
+      display: grid;
+      gap: 30px;
+    }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px -5px var(--accent-glow);
+      transform: translateY(-4px);
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section h2::before {
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    .command-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .cmd-tag {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .cmd-tag:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .script-card {
+      margin-top: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .script-header {
+      padding: 12px 20px;
+      background: var(--surface-hover);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .script-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .script-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .script-card.active .script-body {
+      max-height: 1000px;
+      border-top: 1px solid var(--border);
+    }
+
+    pre {
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #d1d1d1;
+      background: var(--code-bg);
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+
+    .chevron {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      transition: transform 0.3s;
+    }
+
+    .script-card.active .chevron {
+      transform: rotate(90deg);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 80px;
+      padding-bottom: 40px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .section {
+        padding: 20px 15px;
+        border-radius: 16px;
+      }
+
+      .section h2 {
+        font-size: 1.3rem;
+      }
+
+      .modal {
+        padding: 25px 20px;
+        width: 95%;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Search Bar Styles */
+    .search-container {
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(15, 15, 18, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 14px 20px 14px 45px;
+      border-radius: 14px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      background: var(--surface);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-dim);
+      display: none;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 15px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .modal-desc {
+      font-size: 1.1rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-title" id="modalTitle">Command</div>
+      <div class="modal-desc" id="modalDesc">Description goes here...</div>
+    </div>
+  </div>
+
+  <header>
+    <h1>Linux Essentials</h1>
+    <p class="subtitle">Complete Practical Guide & Reference</p>
+  </header>
+
+  <div class="search-container">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search commands, scripts, or practicals...">
+    </div>
+  </div>
+
+  <div class="no-results" id="noResults">
+    <div style="font-size: 3rem; margin-bottom: 10px;">∅</div>
+    <p>No matches found. Try searching for something else.</p>
+  </div>
+
+  <div class="container" id="mainContainer">
+
+    <!-- Practical 2 -->
+    <div class="section fade-in" style="animation-delay: 0.1s;">
+      <h2>Practical 2: General Utility</h2>
+      <div class="command-grid">
+        <span class="cmd-tag">pwd</span>
+        <span class="cmd-tag">cd</span>
+        <span class="cmd-tag">mkdir</span>
+        <span class="cmd-tag">touch</span>
+        <span class="cmd-tag">cat</span>
+        <span class="cmd-tag">sort</span>
+        <span class="cmd-tag">date</span>
+        <span class="cmd-tag">time</span>
+        <span class="cmd-tag">cal</span>
+        <span class="cmd-tag">tty</span>
+        <span class="cmd-tag">bc</span>
+        <span class="cmd-tag">echo</span>
+        <span class="cmd-tag">clear</span>
+        <span class="cmd-tag">exit</span>
+        <span class="cmd-tag">man</span>
+        <span class="cmd-tag">which</span>
+        <span class="cmd-tag">history</span>
+        <span class="cmd-tag">lp</span>
+        <span class="cmd-tag">lpr</span>
+        <span class="cmd-tag">lpstat</span>
+        <span class="cmd-tag">lpq</span>
+        <span class="cmd-tag">lprm</span>
+        <span class="cmd-tag">cancel</span>
+        <span class="cmd-tag">who</span>
+        <span class="cmd-tag">whoami</span>
+        <span class="cmd-tag">mv</span>
+        <span class="cmd-tag">cp</span>
+        <span class="cmd-tag">rm</span>
+      </div>
+    </div>
+
+    <!-- Practical 3 -->
+    <div class="section fade-in" style="animation-delay: 0.2s;">
+      <h2>Practical 3: File Management</h2>
+      <div class="command-grid">
+        <span class="cmd-tag">ls</span>
+        <span class="cmd-tag">chmod</span>
+        <span class="cmd-tag">wc</span>
+        <span class="cmd-tag">grep</span>
+        <span class="cmd-tag">tr</span>
+        <span class="cmd-tag">head</span>
+        <span class="cmd-tag">tail</span>
+        <span class="cmd-tag">diff</span>
+        <span class="cmd-tag">comm</span>
+        <span class="cmd-tag">less</span>
+        <span class="cmd-tag">more</span>
+        <span class="cmd-tag">file</span>
+        <span class="cmd-tag">type</span>
+        <span class="cmd-tag">split</span>
+        <span class="cmd-tag">cmp</span>
+        <span class="cmd-tag">tar</span>
+        <span class="cmd-tag">find</span>
+        <span class="cmd-tag">vim</span>
+        <span class="cmd-tag">gzip</span>
+        <span class="cmd-tag">bzip2</span>
+        <span class="cmd-tag">unzip</span>
+        <span class="cmd-tag">locate</span>
+      </div>
+    </div>
+
+    <!-- Practical 4 -->
+    <div class="section fade-in" style="animation-delay: 0.3s;">
+      <h2>Practical 4: User Management</h2>
+      <div class="command-grid">
+        <span class="cmd-tag">su</span>
+        <span class="cmd-tag">sudo</span>
+        <span class="cmd-tag">login</span>
+        <span class="cmd-tag">logout</span>
+        <span class="cmd-tag">passwd</span>
+        <span class="cmd-tag">useradd</span>
+        <span class="cmd-tag">adduser</span>
+        <span class="cmd-tag">usermod</span>
+        <span class="cmd-tag">userdel</span>
+        <span class="cmd-tag">groupadd</span>
+        <span class="cmd-tag">groupmod</span>
+        <span class="cmd-tag">groupdel</span>
+        <span class="cmd-tag">gpasswd</span>
+        <span class="cmd-tag">chown</span>
+        <span class="cmd-tag">chage</span>
+        <span class="cmd-tag">chgrp</span>
+        <span class="cmd-tag">chfn</span>
+      </div>
+    </div>
+
+    <!-- Practical 5 -->
+    <div class="section fade-in" style="animation-delay: 0.4s;">
+      <h2>Practical 5: Process & Memory</h2>
+      <p style="color: var(--text-dim); margin-bottom: 10px; font-size: 0.9rem;">Process Management</p>
+      <div class="command-grid" style="margin-bottom: 20px;">
+        <span class="cmd-tag">ps</span>
+        <span class="cmd-tag">pstree</span>
+        <span class="cmd-tag">nice</span>
+        <span class="cmd-tag">kill</span>
+        <span class="cmd-tag">pkill</span>
+        <span class="cmd-tag">killall</span>
+        <span class="cmd-tag">xkill</span>
+        <span class="cmd-tag">fg</span>
+        <span class="cmd-tag">bg</span>
+        <span class="cmd-tag">pgrep</span>
+        <span class="cmd-tag">renice</span>
+      </div>
+      <p style="color: var(--text-dim); margin-bottom: 10px; font-size: 0.9rem;">Memory Management</p>
+      <div class="command-grid">
+        <span class="cmd-tag">free</span>
+        <span class="cmd-tag">/proc/meminfo</span>
+        <span class="cmd-tag">top</span>
+        <span class="cmd-tag">htop</span>
+        <span class="cmd-tag">df</span>
+        <span class="cmd-tag">du</span>
+        <span class="cmd-tag">vmstat</span>
+        <span class="cmd-tag">demidecode</span>
+        <span class="cmd-tag">sar</span>
+        <span class="cmd-tag">pagesize</span>
+      </div>
+    </div>
+
+    <!-- Practical 6 -->
+    <div class="section fade-in" style="animation-delay: 0.5s;">
+      <h2>Practical 6: Networking</h2>
+      <div class="command-grid">
+        <span class="cmd-tag">ifconfig</span>
+        <span class="cmd-tag">ping</span>
+        <span class="cmd-tag">traceroute</span>
+        <span class="cmd-tag">netstat</span>
+        <span class="cmd-tag">nslookup</span>
+        <span class="cmd-tag">whois</span>
+        <span class="cmd-tag">hostname</span>
+        <span class="cmd-tag">tcpdump</span>
+        <span class="cmd-tag">dig</span>
+        <span class="cmd-tag">route</span>
+        <span class="cmd-tag">host</span>
+        <span class="cmd-tag">arp</span>
+        <span class="cmd-tag">iwconfig</span>
+        <span class="cmd-tag">curl</span>
+        <span class="cmd-tag">wget</span>
+        <span class="cmd-tag">telnet</span>
+        <span class="cmd-tag">ifplugstatus</span>
+        <span class="cmd-tag">nload</span>
+        <span class="cmd-tag">w</span>
+        <span class="cmd-tag">mail</span>
+      </div>
+    </div>
+
+    <!-- Practical 7 -->
+    <div class="section fade-in" style="animation-delay: 0.6s;">
+      <h2>Practical 7: Basic Shell Scripts</h2>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(i) Arithmetic Operations</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter two numbers:"
+read a
+read b
+echo "Sum: $((a + b))"
+echo "Difference: $((a - b))"
+echo "Product: $((a * b))"
+echo "Quotient: $((a / b))"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ii) Simple Interest</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter Principal, Rate and Time:"
+read p
+read r
+read t
+si=$(echo "scale=2; ($p * $r * $t) / 100" | bc)
+echo "Simple Interest: $si"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iii) Largest of Three</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter three numbers:"
+read a b c
+if [ $a -gt $b ] &amp;&amp; [ $a -gt $c ]; then
+    echo "$a is largest"
+elif [ $b -gt $a ] &amp;&amp; [ $b -gt $c ]; then
+    echo "$b is largest"
+else
+    echo "$c is largest"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iv) Leap Year</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter year:"
+read y
+if [ $((y % 400)) -eq 0 ] || ([ $((y % 4)) -eq 0 ] &amp;&amp; [ $((y % 100)) -ne 0 ]); then
+    echo "$y is a Leap Year"
+else
+    echo "$y is not a Leap Year"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(v) Multiplication Table (While Loop)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter number:"
+read n
+i=1
+while [ $i -le 10 ]; do
+    echo "$n x $i = $((n * i))"
+    i=$((i + 1))
+done</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vi) Factorial (For & While Loop)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter number:"
+read n
+# Using For loop
+fact_f=1
+for ((i=1; i&lt;=n; i++)); do
+    fact_f=$((fact_f * i))
+done
+echo "Factorial (For): $fact_f"
+
+# Using While loop
+fact_w=1
+temp=$n
+while [ $temp -gt 1 ]; do
+    fact_w=$((fact_w * temp))
+    temp=$((temp - 1))
+done
+echo "Factorial (While): $fact_w"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vii) Armstrong Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter number:"
+read n
+sum=0
+temp=$n
+while [ $temp -gt 0 ]; do
+    digit=$((temp % 10))
+    sum=$((sum + digit**3))
+    temp=$((temp / 10))
+done
+if [ $sum -eq $n ]; then
+    echo "Armstrong number"
+else
+    echo "Not Armstrong"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(viii) Hello World Program</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Hello World"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ix) Multiplication of Two Numbers</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter 1st number:"
+read n
+echo "Enter 2nd number:"
+read m
+echo "Product: $((n * m))"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(x) Division of Two Numbers</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter dividend:"
+read n
+echo "Enter divisor:"
+read m
+echo "Result: $((n / m))"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(xi) Check Odd or Even</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter number:"
+read n
+if [ $((n % 2)) -eq 0 ]; then
+    echo "Even"
+else
+    echo "Odd"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(xii) Check Prime Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter number:"
+read n
+if [ $n -le 1 ]; then echo "Not Prime"; exit; fi
+for ((i=2; i*i&lt;=n; i++)); do
+    if [ $((n % i)) -eq 0 ]; then
+        echo "Not Prime"
+        exit
+    fi
+done
+echo "Prime"</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical 8 -->
+    <div class="section fade-in" style="animation-delay: 0.7s;">
+      <h2>Practical 8: Advanced Shell Scripts</h2>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(i) Search Element in List</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter elements (space separated):"
+read -a list
+echo "Enter element to search:"
+read search
+found=0
+for i in "${list[@]}"; do
+    if [ "$i" == "$search" ]; then
+        found=1
+        break
+    fi
+done
+if [ $found -eq 1 ]; then echo "Present"; else echo "Not Present"; fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ii) Compare Two Strings</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter string 1:"
+read s1
+echo "Enter string 2:"
+read s2
+if [ "$s1" == "$s2" ]; then
+    echo "Strings are equal"
+else
+    echo "Strings are not equal"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iii) Check File/Dir Exists</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter name:"
+read name
+if [ -e "$name" ]; then
+    echo "Exists"
+else
+    echo "Not found. Creating..."
+    if [[ "$name" == *"."* ]]; then touch "$name"; else mkdir "$name"; fi
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iv) Menu Driven Calculator</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "1. Add 2. Sub 3. Mul 4. Div"
+read ch
+echo "Enter numbers:"
+read a b
+case $ch in
+    1) echo "Result: $((a+b))";;
+    2) echo "Result: $((a-b))";;
+    3) echo "Result: $((a*b))";;
+    4) echo "Result: $((a/b))";;
+    *) echo "Invalid choice";;
+esac</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(v) Logged-in User Details</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "logged in user details"
+who -u
+echo "total users:"
+who | wc -l</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vi) Check File or Directory</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter name"
+read val
+if [ -d "$val" ]; then
+    echo "directory"
+elif [ -f "$val" ]; then
+    echo "file"
+else
+    echo "invalid"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vii) Create Directory (Conditional)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter directory name"
+read d
+if [ ! -d "$d" ]; then
+    mkdir "$d"
+    echo "directory created"
+else
+    echo "directory exists"
+fi</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(viii) Create File in Directory</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter directory name"
+read d
+mkdir -p "$d"
+echo "enter file name"
+read f
+touch "$d/$f"
+echo "file created"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ix) Add Content into File</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter directory name"
+read d
+mkdir -p "$d"
+echo "enter file name"
+read f
+touch "$d/$f"
+echo "enter content"
+read content
+echo "$content" &gt;&gt; "$d/$f"
+echo "content added"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(x) Copy File to Another Directory</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter source directory"
+read s
+echo "enter file name"
+read f
+echo "enter destination directory"
+read d
+mkdir -p "$d"
+cp "$s/$f" "$d/"
+echo "file copied"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(xi) Count Files & Directories</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "enter directory"
+read d
+files=$(find "$d" -type f | wc -l)
+dirs=$(find "$d" -type d | wc -l)
+echo "files: $files"
+echo "directories: $dirs"
+echo "total: $((files+dirs))"</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical 9 -->
+    <div class="section fade-in" style="animation-delay: 0.8s;">
+      <h2>Practical 9: Perl & Text Scripts</h2>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(i) Perl: Sort Array</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+@arr = (5, 2, 8, 1, 9);
+@sorted = sort { $a &lt;=&gt; $b } @arr;
+print "Sorted: @sorted\n";</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ii) Perl: Prime Check</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter number: ";
+$n = &lt;STDIN&gt;;
+$flag = 0;
+for($i=2; $i&lt;=$n/2; $i++) {
+    if($n % $i == 0) { $flag = 1; last; }
+}
+if($flag == 0 &amp;&amp; $n &gt; 1) { print "Prime\n"; } else { print "Not Prime\n"; }</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iii) Word Count Script (wc)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+# Count lines, words, chars in a file
+echo "Enter filename:"
+read f
+lines=$(wc -l &lt; $f)
+words=$(wc -w &lt; $f)
+chars=$(wc -m &lt; $f)
+echo "Lines: $lines, Words: $words, Chars: $chars"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iv) List Specific Files (egrep)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+# List .txt and .sh files
+ls | egrep "\.txt$|\.sh$"</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(v) Print Duplicate Lines (sed)</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+# Find duplicated lines
+sed -n 'p' input.txt | sort | uniq -d</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vi) Perl: Read and Print Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter number:";
+$n = &lt;&gt;;
+print "Entered number is $n";</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vii) Perl: Addition of Two Numbers</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter number1:";
+$n1 = &lt;&gt;;
+print "Enter number2:";
+$n2 = &lt;&gt;;
+$sum = $n1 + $n2;
+print "SUM is $sum";</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(viii) Perl: Search Element in List</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter list (space separated):";
+$input = &lt;&gt;;
+@arr = split(' ', $input);
+print "Enter element to search:";
+$ele = &lt;&gt;;
+chomp($ele);
+
+$found = 0;
+foreach $i (@arr) {
+    if ($i eq $ele) {
+        $found = 1;
+        last;
+    }
+}
+if ($found) { print "Element found\n"; } else { print "Not found\n"; }</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ix) Perl: Compare Two Strings</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter string1:";
+$a = &lt;&gt;;
+print "Enter string2:";
+$b = &lt;&gt;;
+chomp($a); chomp($b);
+if ($a eq $b) { print "Equal\n"; } else { print "Not equal\n"; }</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(x) Perl: Menu Driven Calculator</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/usr/bin/perl
+print "Enter a:"; $a = &lt;&gt;;
+print "Enter b:"; $b = &lt;&gt;;
+print "1.Add 2.Sub 3.Mul 4.Div\n";
+$ch = &lt;&gt;;
+if ($ch == 1) { print $a + $b; }
+elsif ($ch == 2) { print $a - $b; }
+elsif ($ch == 3) { print $a * $b; }
+elsif ($ch == 4) { print $a / $b; }
+else { print "Invalid"; }
+print "\n";</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical 10 -->
+    <div class="section fade-in" style="animation-delay: 0.9s;">
+      <h2>Practical 10: AWK Scripts</h2>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(i) AWK: Even Numbers in Range</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre># Run as: awk -f script.awk
+BEGIN {
+    print "Enter start and end range:"
+    getline start &lt; "-"
+    getline end &lt; "-"
+    for(i=start; i&lt;=end; i++) {
+        if(i % 2 == 0) print i
+    }
+}</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(ii) AWK: Fibonacci Series</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>BEGIN {
+    print "Enter number of terms:"
+    getline n &lt; "-"
+    a=0; b=1;
+    for(i=0; i&lt;n; i++) {
+        print a;
+        c=a+b; a=b; b=c;
+    }
+}</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iii) Sed: Replace Particular Word</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>#!/bin/bash
+echo "Enter filename, old word, new word:"
+read f old new
+sed -i "s/$old/$new/g" $f
+echo "Replacement done."</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(iv) AWK: Read and Print Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>awk 'BEGIN{print "Enter number"; getline n &lt; "-"; print "Entered: " n;}'</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(v) AWK: Addition of Two Numbers</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>awk 'BEGIN{
+    print "Enter number1"; getline a &lt; "-";
+    print "Enter number2"; getline b &lt; "-";
+    print "Sum: " (a+b);
+}'</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vi) AWK: Factorial of Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>awk 'BEGIN{
+    print "Enter number"; getline n &lt; "-";
+    fact=1;
+    for(i=1; i&lt;=n; i++) fact*=i;
+    print "Factorial: " fact;
+}'</pre>
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="script-header" onclick="toggleScript(this)">
+          <span class="script-title">(vii) AWK: Check Prime Number</span>
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <span class="chevron">▶</span>
+          </div>
+        </div>
+        <div class="script-body">
+          <pre>awk 'BEGIN{
+    print "Enter number:";
+    getline n &lt; "-";
+    if (n &lt;= 1) { print "Not Prime"; exit }
+    flag = 0;
+    for (i = 2; i * i &lt;= n; i++) {
+        if (n % i == 0) { flag = 1; break }
+    }
+    if (flag == 0) print "Prime"
+    else print "Not Prime"
+}'</pre>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Linux Laboratory Reference</p>
+  </footer>
+
+  <script>
+    const cmdInfo = {
+      "pwd": { desc: "Present Working Directory - shows the full path of the current directory you are in.", example: "pwd", output: "/home/user/documents" },
+      "cd": { desc: "Change Directory - used to navigate between different folders in the file system.", example: "cd /var/log", output: "(Changes directory)" },
+      "mkdir": { desc: "Make Directory - creates one or more new directories (folders).", example: "mkdir new_folder", output: "(Creates folder)" },
+      "touch": { desc: "Used to create empty files or update the access/modification timestamps of existing files.", example: "touch file.txt", output: "(Creates file)" },
+      "cat": { desc: "Concatenate - displays the content of files, or combines multiple files into one.", example: "cat file.txt", output: "Hello, World!" },
+      "sort": { desc: "Sorts lines of text in a file alphabetically or numerically.", example: "sort names.txt", output: "Alice\\nBob\\nCharlie" },
+      "date": { desc: "Displays or sets the system date and time.", example: "date", output: "Mon Oct 25 10:00:00 UTC 2026" },
+      "time": { desc: "Reports how long a command takes to execute (real, user, and sys time).", example: "time ls", output: "real  0m0.002s\\nuser  0m0.001s\\nsys   0m0.001s" },
+      "cal": { desc: "Displays a simple calendar for the current month or a specified year.", example: "cal", output: "    October 2026\\nSu Mo Tu We Th Fr Sa\\n             1  2  3..." },
+      "tty": { desc: "Prints the file name of the terminal connected to standard input.", example: "tty", output: "/dev/pts/0" },
+      "bc": { desc: "An arbitrary precision calculator language for complex mathematical operations.", example: "echo '5+5' | bc", output: "10" },
+      "echo": { desc: "Prints text or variables to the terminal output.", example: "echo 'Hello Linux'", output: "Hello Linux" },
+      "clear": { desc: "Clears all previous commands and output from the terminal screen.", example: "clear", output: "(Clears the terminal screen)" },
+      "exit": { desc: "Closes the current terminal window or exits a shell session.", example: "exit", output: "logout" },
+      "man": { desc: "Manual - provides detailed documentation and usage instructions for Linux commands.", example: "man ls", output: "LS(1) User Commands LS(1)\\nNAME\\n       ls - list directory contents..." },
+      "which": { desc: "Locates the executable file associated with a given command name.", example: "which bash", output: "/bin/bash" },
+      "history": { desc: "Shows a list of the most recently executed commands in the current session.", example: "history", output: "  1  ls\\n  2  cd /var\\n  3  history" },
+      "lp": { desc: "Sends a file to be printed (Line Printer).", example: "lp document.txt", output: "request id is printer-1 (1 file(s))" },
+      "lpr": { desc: "An alternative command to submit print jobs to a queue.", example: "lpr document.txt", output: "(Queues file for printing)" },
+      "lpstat": { desc: "Displays the current status of printers and print jobs.", example: "lpstat -p", output: "printer is idle. enabled since Jan 01 00:00" },
+      "lpq": { desc: "Shows the status of the printer queue, including pending jobs.", example: "lpq", output: "printer is ready\\nno entries" },
+      "lprm": { desc: "Removes one or more jobs from the print queue.", example: "lprm 1", output: "(Removes job 1 from queue)" },
+      "cancel": { desc: "Cancels a specific print job currently in progress or in the queue.", example: "cancel printer-1", output: "request 'printer-1' cancelled" },
+      "who": { desc: "Lists all users who are currently logged into the system.", example: "who", output: "user     pts/0        2026-10-25 09:00 (192.168.1.10)" },
+      "whoami": { desc: "Displays the username of the person currently logged into the terminal.", example: "whoami", output: "user" },
+      "mv": { desc: "Move - renames files/directories or moves them to a different location.", example: "mv old.txt new.txt", output: "(Renames or moves file)" },
+      "cp": { desc: "Copy - creates a duplicate of files or directories.", example: "cp file.txt copy.txt", output: "(Copies file)" },
+      "rm": { desc: "Remove - deletes files or directories (permanent, use with caution).", example: "rm file.txt", output: "(Deletes file)" },
+      "ls": { desc: "List - displays all files and subdirectories within the current folder.", example: "ls -l", output: "total 4\\n-rw-r--r-- 1 user user 12 Oct 25 10:00 file.txt" },
+      "rmdir": { desc: "Remove Directory - deletes an empty folder.", example: "rmdir empty_folder", output: "(Deletes empty directory)" },
+      "chmod": { desc: "Change Mode - modifies the read, write, and execute permissions of files.", example: "chmod 755 script.sh", output: "(Changes permissions)" },
+      "wc": { desc: "Word Count - counts the number of lines, words, and characters in a file.", example: "wc file.txt", output: "  10   50  300 file.txt" },
+      "grep": { desc: "Global Regular Expression Print - searches for specific text strings within files.", example: "grep 'error' log.txt", output: "Error: Connection timed out" },
+      "tr": { desc: "Translate - replaces or deletes specific characters in a stream of text.", example: "echo 'hello' | tr 'a-z' 'A-Z'", output: "HELLO" },
+      "head": { desc: "Displays the first 10 lines (by default) of a specified file.", example: "head -n 2 file.txt", output: "Line 1\\nLine 2" },
+      "tail": { desc: "Displays the last 10 lines (by default) of a specified file.", example: "tail -n 2 file.txt", output: "Line 99\\nLine 100" },
+      "diff": { desc: "Compares two files line-by-line and highlights the differences.", example: "diff file1.txt file2.txt", output: "1c1\\n< Hello\\n---\\n> Hi" },
+      "comm": { desc: "Compares two sorted files and shows lines unique to each or common to both.", example: "comm file1.txt file2.txt", output: "        common_line\\nunique_to_1" },
+      "less": { desc: "A terminal pager that allows you to view file content page-by-page (supports scrolling).", example: "less file.txt", output: "(Opens file in pager)" },
+      "more": { desc: "An older terminal pager for viewing content page-by-page (forward only).", example: "more file.txt", output: "(Opens file in pager)" },
+      "file": { desc: "Identifies the type of a file (e.g., text, executable, directory) based on its content.", example: "file image.png", output: "image.png: PNG image data, 800 x 600, 8-bit/color RGB" },
+      "type": { desc: "Indicates how a command name would be interpreted (alias, keyword, function, builtin, or file).", example: "type ls", output: "ls is aliased to 'ls --color=auto'" },
+      "split": { desc: "Breaks a large file into smaller, more manageable pieces.", example: "split -b 1M large.zip", output: "(Splits file into xaa, xab...)" },
+      "cmp": { desc: "Compares two files byte-by-byte to see if they are identical.", example: "cmp file1 file2", output: "file1 file2 differ: byte 1, line 1" },
+      "tar": { desc: "Tape Archive - used to group multiple files into a single archive (often compressed).", example: "tar -czvf archive.tar.gz folder/", output: "folder/\\nfolder/file.txt" },
+      "find": { desc: "Searches for files based on name, size, type, or other attributes.", example: "find . -name '*.txt'", output: "./file.txt\\n./notes.txt" },
+      "vim": { desc: "A highly configurable text editor built to enable efficient text editing.", example: "vim file.txt", output: "(Opens Vim editor)" },
+      "gzip": { desc: "A utility for file compression using the Lempel-Ziv coding (LZ77).", example: "gzip file.txt", output: "(Compresses to file.txt.gz)" },
+      "bzip2": { desc: "A high-quality data compressor that produces smaller files than gzip.", example: "bzip2 file.txt", output: "(Compresses to file.txt.bz2)" },
+      "unzip": { desc: "Extracts files from a .zip archive.", example: "unzip archive.zip", output: "Archive: archive.zip\\n  inflating: file.txt" },
+      "locate": { desc: "Quickly finds files by name using a pre-built database of the file system.", example: "locate passwd", output: "/etc/passwd\\n/usr/bin/passwd" },
+      "su": { desc: "Substitute User - allows you to run commands with the privileges of another user.", example: "su root", output: "Password:\\nroot@host#" },
+      "sudo": { desc: "SuperUser Do - executes a command with administrative (root) privileges.", example: "sudo apt update", output: "[sudo] password for user:\\nReading package lists... Done" },
+      "login": { desc: "Begins a new session on the system for a specific user.", example: "login", output: "host login: user\\nPassword:" },
+      "logout": { desc: "Ends the current session and returns to the login screen.", example: "logout", output: "Connection closed." },
+      "passwd": { desc: "Used to change or update a user's login password.", example: "passwd", output: "Changing password for user.\\nCurrent password:" },
+      "useradd": { desc: "Creates a new user account on the system.", example: "sudo useradd newuser", output: "(Creates new user)" },
+      "adduser": { desc: "A more interactive, user-friendly script for adding new users.", example: "sudo adduser newuser", output: "Adding user 'newuser' ...\\nAdding new group 'newuser' ..." },
+      "usermod": { desc: "Modifies existing user account settings (like groups or home directory).", example: "sudo usermod -aG sudo newuser", output: "(Adds user to sudo group)" },
+      "userdel": { desc: "Deletes a user account and optionally their home directory.", example: "sudo userdel newuser", output: "(Deletes user)" },
+      "groupadd": { desc: "Creates a new user group.", example: "sudo groupadd devs", output: "(Creates new group)" },
+      "groupmod": { desc: "Modifies the name or ID of an existing group.", example: "sudo groupmod -n developers devs", output: "(Renames group)" },
+      "groupdel": { desc: "Deletes an existing group from the system.", example: "sudo groupdel devs", output: "(Deletes group)" },
+      "gpasswd": { desc: "Used to administer the /etc/group and /etc/gshadow files.", example: "sudo gpasswd -a user devs", output: "Adding user user to group devs" },
+      "chown": { desc: "Change Owner - changes the user and/or group ownership of a file.", example: "sudo chown root:root file.txt", output: "(Changes owner and group)" },
+      "chage": { desc: "Changes the password expiry and aging information for a user.", example: "sudo chage -l user", output: "Last password change: Oct 25, 2026\\nPassword expires: never" },
+      "chgrp": { desc: "Change Group - modifies the group ownership of a file.", example: "sudo chgrp devs file.txt", output: "(Changes group)" },
+      "chfn": { desc: "Change Finger - updates a user's real name and office information.", example: "chfn", output: "Changing finger information for user.\\nName []:" },
+      "ps": { desc: "Process Status - provides a snapshot of currently running processes.", example: "ps aux", output: "USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND\\nuser 123 0.0 0.1 1000 500 ? S 10:00 0:00 bash" },
+      "pstree": { desc: "Shows running processes in a visual tree hierarchy to show parent-child relationships.", example: "pstree", output: "systemd─┬─NetworkManager\\n        ├─sshd───sshd───bash───pstree" },
+      "nice": { desc: "Starts a process with a specific priority (niceness value).", example: "nice -n 10 ./script.sh", output: "(Runs script with lower priority)" },
+      "kill": { desc: "Sends a signal (usually termination) to a process using its PID.", example: "kill 1234", output: "(Terminates process 1234)" },
+      "pkill": { desc: "Signals processes based on their name rather than their PID.", example: "pkill firefox", output: "(Terminates all firefox processes)" },
+      "killall": { desc: "Kills all processes that match a specific name.", example: "killall apache2", output: "(Terminates all apache2 processes)" },
+      "xkill": { desc: "A graphical tool to kill an unresponsive window by clicking on it.", example: "xkill", output: "Select the window whose client you wish to kill with button 1..." },
+      "fg": { desc: "Foreground - brings a background job back to the interactive terminal.", example: "fg %1", output: "(Brings background job 1 to foreground)" },
+      "bg": { desc: "Background - resumes a suspended job in the background.", example: "bg %1", output: "[1]+ ./script.sh &" },
+      "pgrep": { desc: "Finds the process IDs (PIDs) of running programs based on name.", example: "pgrep ssh", output: "987\\n1023" },
+      "renice": { desc: "Changes the scheduling priority of an already running process.", example: "renice +5 1234", output: "1234 (process ID) old priority 0, new priority 5" },
+      "free": { desc: "Displays the total amount of free and used physical and swap memory.", example: "free -h", output: "              total        used        free\\nMem:           15Gi       3.2Gi       8.5Gi" },
+      "/proc/meminfo": { desc: "A virtual file containing detailed statistics about the system's memory usage.", example: "cat /proc/meminfo | head -n 3", output: "MemTotal:       16315532 kB\\nMemFree:         8912340 kB" },
+      "top": { desc: "Provides a dynamic, real-time view of the system's running processes and resource usage.", example: "top", output: "top - 10:00:00 up 1 day,  1:00,  1 user\\nTasks: 150 total,   1 running..." },
+      "htop": { desc: "An interactive, colorful process viewer (a more modern version of top).", example: "htop", output: "(Opens interactive process viewer)" },
+      "df": { desc: "Disk Free - shows the amount of available disk space on file systems.", example: "df -h", output: "Filesystem      Size  Used Avail Use% Mounted on\\n/dev/sda1        50G   20G   28G  42% /" },
+      "du": { desc: "Disk Usage - estimates the space used by specific files or directories.", example: "du -sh /var/log", output: "250M    /var/log" },
+      "vmstat": { desc: "Virtual Memory Statistics - reports info on processes, memory, paging, and CPU activity.", example: "vmstat 1 3", output: "procs -----------memory----------\\n r  b   swpd   free   buff  cache" },
+      "demidecode": { desc: "Dumps the system's DMI (SMBIOS) table in a human-readable format for hardware info.", example: "sudo dmidecode -t memory", output: "# dmidecode 3.2\\nGetting SMBIOS data from sysfs." },
+      "sar": { desc: "System Activity Reporter - collects, reports, and saves system activity information.", example: "sar -u 1 3", output: "Linux 5.4.0 (host)   10/25/2026   _x86_64_\\n10:00:00 AM     CPU     %user" },
+      "pagesize": { desc: "Prints the size of a page of memory in bytes.", example: "pagesize", output: "4096" },
+      "ifconfig": { desc: "Interface Configuration - used to view or configure network interfaces (older tool).", example: "ifconfig eth0", output: "eth0: flags=4163<UP,BROADCAST,RUNNING>  mtu 1500\\n        inet 192.168.1.10" },
+      "ping": { desc: "Sends ICMP echo requests to a network host to test connectivity.", example: "ping -c 4 google.com", output: "PING google.com (142.250.190.46) 56(84) bytes of data.\\n64 bytes from 142.250.190.46" },
+      "traceroute": { desc: "Displays the path (hop by hop) that packets take to reach a destination host.", example: "traceroute google.com", output: "traceroute to google.com (142.250.190.46), 30 hops max\\n 1  router (192.168.1.1)  1.234 ms" },
+      "netstat": { desc: "Network Statistics - shows network connections, routing tables, and interface stats.", example: "netstat -tuln", output: "Active Internet connections (only servers)\\nProto Recv-Q Send-Q Local Address" },
+      "nslookup": { desc: "Queries Domain Name System (DNS) to obtain domain name or IP address mapping.", example: "nslookup google.com", output: "Server:         8.8.8.8\\nAddress:        8.8.8.8#53" },
+      "whois": { desc: "A protocol for querying databases that store domain and IP registration info.", example: "whois google.com", output: "Domain Name: GOOGLE.COM\\nRegistry Domain ID: 2138514_DOMAIN_COM-VRSN" },
+      "hostname": { desc: "Used to either set or display the system's current host name.", example: "hostname", output: "my-linux-server" },
+      "tcpdump": { desc: "A powerful command-line packet sniffer and network analyzer.", example: "sudo tcpdump -i eth0 port 80", output: "tcpdump: verbose output suppressed\\nlistening on eth0, link-type EN10MB" },
+      "dig": { desc: "Domain Information Groper - a flexible tool for interrogating DNS servers.", example: "dig google.com", output: "; <<>> DiG 9.16.1-Ubuntu <<>> google.com\\n;; global options: +cmd" },
+      "route": { desc: "Displays or manipulates the IP routing table.", example: "route -n", output: "Kernel IP routing table\\nDestination     Gateway         Genmask" },
+      "host": { desc: "A simple utility for performing DNS lookups (translates names to IPs and vice versa).", example: "host google.com", output: "google.com has address 142.250.190.46\\ngoogle.com mail is handled by 10 smtp.google.com." },
+      "arp": { desc: "Address Resolution Protocol - displays and modifies the IP-to-Physical address translation tables.", example: "arp -a", output: "router.local (192.168.1.1) at 00:11:22:33:44:55 [ether] on eth0" },
+      "iwconfig": { desc: "Used to configure wireless network interfaces (similar to ifconfig but for Wi-Fi).", example: "iwconfig wlan0", output: "wlan0     IEEE 802.11  ESSID:'MyWiFi'\\n          Mode:Managed  Frequency:2.437 GHz" },
+      "curl": { desc: "A tool to transfer data from or to a server using various protocols (HTTP, FTP, etc.).", example: "curl -I https://google.com", output: "HTTP/2 301 \\nlocation: https://www.google.com/" },
+      "wget": { desc: "A network utility to retrieve content from web servers (supports background downloads).", example: "wget https://example.com/file.zip", output: "Resolving example.com... 93.184.216.34\\nConnecting to example.com... connected." },
+      "telnet": { desc: "An older protocol for interactive communication with another host (not secure).", example: "telnet towel.blinkenlights.nl", output: "Trying 213.136.8.188...\\nConnected to towel.blinkenlights.nl." },
+      "ifplugstatus": { desc: "A small utility which tells you whether a network cable is plugged in or not.", example: "ifplugstatus eth0", output: "eth0: link beat detected" },
+      "nload": { desc: "A console-based application which monitors network traffic and bandwidth usage in real-time.", example: "nload eth0", output: "(Opens interactive network traffic monitor)" },
+      "w": { desc: "Displays information about the users currently on the machine and their processes.", example: "w", output: " 10:00:00 up 1 day,  1:00,  2 users\\nUSER     TTY      FROM             LOGIN@" },
+      "mail": { desc: "A simple command-line interface for sending and receiving emails.", example: "echo 'Message body' | mail -s 'Subject' user@example.com", output: "(Sends email, no output on success)" },
+      "piping and redirection": { desc: "Redirection (> or >>) sends output to files; Piping (|) sends output of one command as input to another.", example: "ls -l | grep '.txt' > texts.txt", output: "(Finds .txt files and saves to texts.txt)" }
+    };
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+
+    function openModal(cmd) {
+      const info = cmdInfo[cmd];
+      if (info) {
+        modalTitle.innerText = cmd;
+        modalDesc.innerHTML = `
+          <p>${info.desc}</p>
+          <div style="margin-top: 15px;">
+            <strong style="color: var(--accent);">Example:</strong>
+            <pre style="background: var(--code-bg); padding: 10px; border-radius: 8px; margin-top: 5px; white-space: pre-wrap; word-break: break-all; font-family: 'JetBrains Mono', monospace;">$ ${info.example.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+          </div>
+          <div style="margin-top: 15px;">
+            <strong style="color: var(--accent);">Output:</strong>
+            <pre style="background: var(--code-bg); padding: 10px; border-radius: 8px; margin-top: 5px; white-space: pre-wrap; word-break: break-all; font-family: 'JetBrains Mono', monospace;">${info.output.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+          </div>
+        `;
+      } else {
+        modalTitle.innerText = cmd;
+        modalDesc.innerText = "No description available for this command.";
+      }
+      modalOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close on clicking outside
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    function toggleScript(header) {
+      const card = header.parentElement;
+      card.classList.toggle('active');
+    }
+
+    async function copyCode(btn) {
+      const code = btn.closest('.script-header').nextElementSibling.querySelector('pre').innerText;
+      try {
+        await navigator.clipboard.writeText(code);
+        const originalText = btn.innerText;
+        btn.innerText = 'Copied!';
+        btn.style.borderColor = 'var(--success)';
+        btn.style.color = 'var(--success)';
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.borderColor = 'var(--border)';
+          btn.style.color = 'var(--text-dim)';
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
+
+    // Attach click events to command tags
+    document.querySelectorAll('.cmd-tag').forEach(tag => {
+      tag.addEventListener('click', async () => {
+        const cmd = tag.innerText.trim();
+
+        // Copy to clipboard
+        try {
+          await navigator.clipboard.writeText(cmd);
+
+          // Visual feedback on the tag
+          const originalColor = tag.style.color;
+          const originalBorder = tag.style.borderColor;
+          tag.style.color = 'var(--bg)';
+          tag.style.backgroundColor = 'var(--success)';
+          tag.style.borderColor = 'var(--success)';
+          tag.style.boxShadow = '0 0 15px var(--success)';
+
+          setTimeout(() => {
+            tag.style.color = '';
+            tag.style.backgroundColor = '';
+            tag.style.borderColor = '';
+            tag.style.boxShadow = '';
+          }, 600);
+        } catch (err) {
+          console.error('Copy failed', err);
+        }
+
+        // Still open the modal for info
+        openModal(cmd);
+      });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const sections = document.querySelectorAll('.section');
+    const noResults = document.getElementById('noResults');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      let hasMatches = false;
+
+      sections.forEach(section => {
+        let sectionMatch = false;
+
+        // Check section title
+        const title = section.querySelector('h2').innerText.toLowerCase();
+        if (title.includes(query)) sectionMatch = true;
+
+        // Check command tags
+        const tags = section.querySelectorAll('.cmd-tag');
+        tags.forEach(tag => {
+          const txt = tag.innerText.toLowerCase();
+          if (txt.includes(query)) {
+            tag.style.display = 'block';
+            sectionMatch = true;
+          } else {
+            tag.style.display = query === "" ? "block" : "none";
+          }
+        });
+
+        // Check script cards
+        const cards = section.querySelectorAll('.script-card');
+        cards.forEach(card => {
+          const txt = card.querySelector('.script-title').innerText.toLowerCase();
+          if (txt.includes(query)) {
+            card.style.display = 'block';
+            sectionMatch = true;
+          } else {
+            card.style.display = query === "" ? "block" : "none";
+          }
+        });
+
+        if (sectionMatch) {
+          section.style.display = 'block';
+          hasMatches = true;
+        } else {
+          section.style.display = 'none';
+        }
+      });
+
+      noResults.style.display = hasMatches ? 'none' : 'block';
+    });
+  </script>
+</body>
+
+</html>
