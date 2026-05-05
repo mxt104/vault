@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Offline Code Vault</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .file {
+            border: 1px solid gray;
+            margin: 10px 0;
+            padding: 10px;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            white-space: pre-wrap;
+            overflow: auto;
+        }
+
+        button,
+        a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Offline File Vault</h2>
+
+    <input type="file" id="files" multiple>
+
+    <button onclick="uploadFiles()">
+        Upload
+    </button>
+
+    <div id="output"></div>
+
+    <script>
+
+        const codeTypes =
+            [
+                ".py", ".txt", ".java",
+                ".js", ".cpp", ".c",
+                ".html", ".css",
+                ".json", ".sql"
+            ];
+
+        let vault =
+            JSON.parse(
+                localStorage.getItem("vault")
+            ) || [];
+
+        function isCode(name) {
+
+            return codeTypes.some(
+                ext =>
+                    name.toLowerCase()
+                        .endsWith(ext)
+            );
+        }
+
+        function uploadFiles() {
+
+            const selected =
+                document.getElementById(
+                    "files"
+                ).files;
+
+            for (let file of selected) {
+
+                const reader =
+                    new FileReader();
+
+                const code =
+                    isCode(file.name);
+
+                reader.onload =
+                    function (e) {
+
+                        vault.push({
+
+                            name: file.name,
+
+                            isCode: code,
+
+                            content:
+                                e.target.result
+                        });
+
+                        save();
+
+                        render();
+                    };
+
+                if (code)
+                    reader.readAsText(
+                        file
+                    );
+
+                else
+                    reader.readAsDataURL(
+                        file
+                    );
+            }
+        }
+
+        function save() {
+
+            localStorage.setItem(
+                "vault",
+                JSON.stringify(vault)
+            );
+        }
+
+        function copyText(text) {
+
+            navigator.clipboard
+                .writeText(text);
+
+            alert("Copied!");
+        }
+
+        function deleteFile(index) {
+
+            vault.splice(
+                index,
+                1
+            );
+
+            save();
+
+            render();
+        }
+
+        function render() {
+
+            const output =
+                document.getElementById(
+                    "output"
+                );
+
+            output.innerHTML = "";
+
+            vault.forEach(
+                (file, index) => {
+
+                    let html = "";
+
+                    if (file.isCode) {
+
+                        html = `
+
+            <button
+            onclick='copyText(
+            ${JSON.stringify(
+                            file.content
+                        )}
+            )'>
+
+            Copy
+
+            </button>
+
+            <pre>${file.content
+                            }</pre>
+            `;
+                    }
+
+                    else {
+
+                        html = `
+
+            <a href="${file.content
+                            }"
+            target="_blank">
+
+            Open
+
+            </a>
+
+            <a href="${file.content
+                            }"
+            download="${file.name
+                            }">
+
+            Download
+
+            </a>
+            `;
+                    }
+
+                    output.innerHTML += `
+
+        <div class="file">
+
+            <h3>${file.name
+                        }</h3>
+
+            ${html}
+
+            <br><br>
+
+            <button
+            onclick="
+            deleteFile(
+            ${index}
+            )">
+
+            Delete
+
+            </button>
+
+        </div>
+        `;
+                });
+        }
+
+        render();
+
+    </script>
+
+</body>
+
+</html>
