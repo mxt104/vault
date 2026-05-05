@@ -55,9 +55,9 @@ const codeExt =
     ".cpp",
     ".c",
     ".js",
+    ".html",
     ".css",
-    ".sql",
-    ".html"
+    ".sql"
 ];
 
 function isCode(name){
@@ -69,8 +69,9 @@ function isCode(name){
 
 function copyText(text){
 
-    navigator.clipboard
-    .writeText(text);
+    navigator.clipboard.writeText(
+        text
+    );
 
     alert("Copied!");
 }
@@ -107,22 +108,6 @@ async function loadFiles(){
             const content =
             await textFile.text();
 
-            let previewButton = "";
-
-            if(file.name.endsWith(".html")){
-
-                previewButton = `
-
-                <a href="${file.download_url}"
-                   target="_blank">
-
-                Preview
-
-                </a>
-
-                `;
-            }
-
             html = `
 
             <button onclick='copyText(
@@ -132,8 +117,6 @@ async function loadFiles(){
             Copy
 
             </button>
-
-            ${previewButton}
 
             <a href="${file.download_url}"
                download>
@@ -152,13 +135,6 @@ ${content}
         else{
 
             html = `
-
-            <a href="${file.download_url}"
-               target="_blank">
-
-            Open
-
-            </a>
 
             <a href="${file.download_url}"
                download>
