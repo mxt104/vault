@@ -29,7 +29,7 @@ pre{
     max-height:400px;
 }
 
-button,a{
+button{
     margin-right:10px;
 }
 
@@ -86,6 +86,35 @@ function escapeHtml(text){
         .replace(/>/g,"&gt;");
 }
 
+async function downloadFile(url,name){
+
+    const response =
+    await fetch(url);
+
+    const blob =
+    await response.blob();
+
+    const objectUrl =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement("a");
+
+    a.href = objectUrl;
+    a.download = name;
+
+    document.body
+    .appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(
+        objectUrl
+    );
+}
+
 async function loadFiles(){
 
     const response =
@@ -130,12 +159,14 @@ async function loadFiles(){
 
             </button>
 
-            <a href="${file.download_url}"
-               download="${file.name}">
+            <button onclick='downloadFile(
+            "${file.download_url}",
+            "${file.name}"
+            )'>
 
             Download
 
-            </a>
+            </button>
 
             <pre>
 ${escapeHtml(content)}
@@ -148,12 +179,14 @@ ${escapeHtml(content)}
 
             html = `
 
-            <a href="${file.download_url}"
-               download="${file.name}">
+            <button onclick='downloadFile(
+            "${file.download_url}",
+            "${file.name}"
+            )'>
 
             Download
 
-            </a>
+            </button>
 
             `;
         }
