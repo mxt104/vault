@@ -26,6 +26,10 @@ pre{
     overflow:auto;
 }
 
+button,a{
+    margin-right:10px;
+}
+
 </style>
 
 </head>
@@ -54,6 +58,14 @@ function isCode(name){
     );
 }
 
+function copyText(text){
+
+    navigator.clipboard
+    .writeText(text);
+
+    alert("Copied!");
+}
+
 async function loadFiles(){
 
     const response =
@@ -80,15 +92,30 @@ async function loadFiles(){
 
         if(isCode(file.name)){
 
-            const text =
+            const textFile =
             await fetch(
             file.download_url
             );
 
             const content =
-            await text.text();
+            await textFile.text();
 
             html = `
+
+            <button onclick='copyText(
+            ${JSON.stringify(content)}
+            )'>
+
+            Copy
+
+            </button>
+
+            <a href="${file.download_url}"
+               download>
+
+            Download
+
+            </a>
 
             <pre>
 ${content}
