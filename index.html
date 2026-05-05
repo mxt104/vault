@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <title>Cloud Vault</title>
@@ -57,23 +58,32 @@ const codeExt =
     ".js",
     ".html",
     ".css",
-    ".sql"
+    ".sql",
+    ".json",
+    ".xml"
 ];
 
 function isCode(name){
 
     return codeExt.some(
-        ext => name.endsWith(ext)
+        ext => name.toLowerCase().endsWith(ext)
     );
 }
 
 function copyText(text){
 
-    navigator.clipboard.writeText(
-        text
-    );
+    navigator.clipboard
+    .writeText(text);
 
     alert("Copied!");
+}
+
+function escapeHtml(text){
+
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
 }
 
 async function loadFiles(){
@@ -90,6 +100,8 @@ async function loadFiles(){
     document.getElementById(
         "files"
     );
+
+    div.innerHTML = "";
 
     for(let file of files){
 
@@ -119,14 +131,14 @@ async function loadFiles(){
             </button>
 
             <a href="${file.download_url}"
-               download>
+               download="${file.name}">
 
             Download
 
             </a>
 
             <pre>
-${content}
+${escapeHtml(content)}
             </pre>
 
             `;
@@ -137,7 +149,7 @@ ${content}
             html = `
 
             <a href="${file.download_url}"
-               download>
+               download="${file.name}">
 
             Download
 
@@ -165,4 +177,5 @@ loadFiles();
 </script>
 
 </body>
+
 </html>
