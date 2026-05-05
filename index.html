@@ -31,6 +31,7 @@ pre{
 
 button{
     margin-right:10px;
+    cursor:pointer;
 }
 
 </style>
@@ -50,17 +51,9 @@ const repo = "vault";
 
 const codeExt =
 [
-    ".py",
-    ".txt",
-    ".java",
-    ".cpp",
-    ".c",
-    ".js",
-    ".html",
-    ".css",
-    ".sql",
-    ".json",
-    ".xml"
+    ".py",".txt",".java",".cpp",".c",
+    ".js",".html",".css",".sql",
+    ".json",".xml",".sh"
 ];
 
 function isCode(name){
@@ -72,18 +65,11 @@ function isCode(name){
 
 function copyText(text){
 
-    navigator.clipboard
-    .writeText(text);
+    navigator.clipboard.writeText(
+        text
+    );
 
     alert("Copied!");
-}
-
-function escapeHtml(text){
-
-    return text
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;");
 }
 
 async function downloadFile(url,name){
@@ -103,12 +89,7 @@ async function downloadFile(url,name){
     a.href = objectUrl;
     a.download = name;
 
-    document.body
-    .appendChild(a);
-
     a.click();
-
-    a.remove();
 
     URL.revokeObjectURL(
         objectUrl
@@ -125,19 +106,55 @@ async function loadFiles(){
     const files =
     await response.json();
 
-    const div =
+    const container =
     document.getElementById(
         "files"
     );
 
-    div.innerHTML = "";
+    container.innerHTML = "";
 
     for(let file of files){
 
-        if(file.name=="index.html")
+        if(file.name==="index.html")
             continue;
 
-        let html = "";
+        const fileBox =
+        document.createElement(
+            "div"
+        );
+
+        fileBox.className =
+        "file";
+
+        const title =
+        document.createElement(
+            "h3"
+        );
+
+        title.textContent =
+        file.name;
+
+        fileBox.appendChild(
+            title
+        );
+
+        const downloadBtn =
+        document.createElement(
+            "button"
+        );
+
+        downloadBtn.textContent =
+        "Download";
+
+        downloadBtn.onclick =
+        ()=>downloadFile(
+            file.download_url,
+            file.name
+        );
+
+        fileBox.appendChild(
+            downloadBtn
+        );
 
         if(isCode(file.name)){
 
@@ -149,59 +166,41 @@ async function loadFiles(){
             const content =
             await textFile.text();
 
-            html = `
+            const copyBtn =
+            document.createElement(
+                "button"
+            );
 
-            <button onclick='copyText(
-            ${JSON.stringify(content)}
-            )'>
+            copyBtn.textContent =
+            "Copy";
 
-            Copy
+            copyBtn.onclick =
+            ()=>copyText(
+                content
+            );
 
-            </button>
+            fileBox.appendChild(
+                copyBtn
+            );
 
-            <button onclick='downloadFile(
-            "${file.download_url}",
-            "${file.name}"
-            )'>
+            const pre =
+            document.createElement(
+                "pre"
+            );
 
-            Download
+            // IMPORTANT:
+            // textContent, not innerHTML
+            pre.textContent =
+            content;
 
-            </button>
-
-            <pre>
-${escapeHtml(content)}
-            </pre>
-
-            `;
+            fileBox.appendChild(
+                pre
+            );
         }
 
-        else{
-
-            html = `
-
-            <button onclick='downloadFile(
-            "${file.download_url}",
-            "${file.name}"
-            )'>
-
-            Download
-
-            </button>
-
-            `;
-        }
-
-        div.innerHTML += `
-
-        <div class="file">
-
-        <h3>${file.name}</h3>
-
-        ${html}
-
-        </div>
-
-        `;
+        container.appendChild(
+            fileBox
+        );
     }
 }
 
