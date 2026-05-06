@@ -1,0 +1,515 @@
+﻿ALL 17 PROGRAMS (HTML + CSS + JS)
+
+
+========================================
+1. Grade Calculator
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<title>Grade</title>
+<style>
+body{text-align:center;font-family:Arial}
+input,button{margin:5px;padding:8px}
+</style>
+</head>
+<body>
+<h2>Grade Calculator</h2>
+<input id="m1" placeholder="Marks 1">
+<input id="m2" placeholder="Marks 2">
+<input id="m3" placeholder="Marks 3"><br>
+<button onclick="calc()">Calculate</button>
+<p id="res"></p>
+<script>
+function calc(){
+let a=+m1.value,b=+m2.value,c=+m3.value;
+let t=a+b+c,p=t/3,g;
+if(p>=90)g="A";
+else if(p>=75)g="B";
+else if(p>=60)g="C";
+else if(p>=40)g="D";
+else g="F";
+res.innerText="Total:"+t+" %:"+p.toFixed(2)+" Grade:"+g;
+}
+</script>
+</body>
+</html>
+
+
+========================================
+2. Multiplication Table
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<title>Table</title>
+<style>
+body{text-align:center;font-family:Arial}
+input,button{margin:5px;padding:8px}
+</style>
+</head>
+<body>
+<h2>Table</h2>
+<input id="num" placeholder="Enter number">
+<button onclick="gen()">Generate</button>
+<div id="out"></div>
+<script>
+function gen(){
+let n=num.value,txt="";
+if(n<=0||n=="") txt="Invalid";
+else{
+for(let i=1;i<=10;i++)
+txt+=n+" x "+i+" = "+(n*i)+"<br>";
+}
+out.innerHTML=txt;
+}
+</script>
+</body>
+</html>
+
+
+========================================
+3. Bank Account
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bank</title>
+<style>
+body{text-align:center;font-family:Arial}
+</style>
+</head>
+<body>
+<h2>Bank</h2>
+<input id="amt" placeholder="Amount"><br>
+<button onclick="dep()">Deposit</button>
+<button onclick="wit()">Withdraw</button>
+<p id="bal"></p>
+<script>
+class BankAccount{
+constructor(n,b){this.name=n;this.balance=b;}
+deposit(a){this.balance+=a;}
+withdraw(a){
+if(a>this.balance) alert("Low Balance");
+else this.balance-=a;
+}}
+let acc=new BankAccount("User",1000);
+function show(){bal.innerText="Balance:"+acc.balance;}
+function dep(){acc.deposit(+amt.value);show();}
+function wit(){acc.withdraw(+amt.value);show();}
+show();
+</script>
+</body>
+</html>
+
+
+========================================
+4. Temperature Converter
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<title>Temp</title>
+<style>
+body{text-align:center;font-family:Arial}
+input{margin:5px;padding:8px}
+</style>
+</head>
+<body>
+<h2>Temperature</h2>
+<input id="c" placeholder="Celsius">
+<input id="f" placeholder="Fahrenheit">
+<p id="msg"></p>
+<script>
+class Temp{
+cToF(c){return c*9/5+32;}
+fToC(f){return (f-32)*5/9;}
+}
+let t=new Temp();
+c.oninput=function(){
+if(isNaN(c.value)){msg.innerText="Invalid";return;}
+f.value=t.cToF(c.value);
+};
+f.oninput=function(){
+if(isNaN(f.value)){msg.innerText="Invalid";return;}
+c.value=t.fToC(f.value);
+};
+</script>
+</body>
+</html>
+
+
+========================================
+5. Shopping Cart
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cart</title>
+<style>
+body{text-align:center;font-family:Arial}
+table{margin:auto;border-collapse:collapse}
+td,th{border:1px solid black;padding:5px}
+</style>
+</head>
+<body>
+<h2>Cart</h2>
+<table id="t">
+<tr><th>Name</th><th>Price</th><th>Qty</th></tr>
+</table>
+<button onclick="total()">Total</button>
+<p id="res"></p>
+<script>
+class Product{
+constructor(n,p,q){this.n=n;this.p=p;this.q=q;}
+}
+let arr=[
+new Product("A",100,2),
+new Product("B",200,1),
+new Product("C",50,5),
+new Product("D",80,3),
+new Product("E",120,2)
+];
+arr.forEach(x=>{
+t.innerHTML+=`<tr><td>${x.n}</td><td>${x.p}</td><td>${x.q}</td></tr>`;
+});
+function total(){
+let s=0;
+arr.forEach(x=>s+=x.p*x.q);
+if(s>500)s*=0.9;
+res.innerText="Total:"+s;
+}
+</script>
+</body>
+</html>
+
+
+========================================
+6. Guess Game
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+input,button{margin:5px;padding:8px}
+</style>
+</head>
+<body>
+<h2>Guess Game</h2>
+<input id="g">
+<button onclick="check()">Guess</button>
+<p id="m"></p>
+<script>
+let n=Math.floor(Math.random()*100)+1,a=0;
+function check(){
+let x=+g.value;a++;
+if(a>5){m.innerText="Game Over "+n;return;}
+if(x==n)m.innerText="Correct";
+else if(x>n)m.innerText="High";
+else m.innerText="Low";
+}
+</script>
+</body>
+</html>
+
+
+========================================
+7. Password Toggle
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+</style>
+</head>
+<body>
+<h2>Password</h2>
+<input type="password" id="p">
+<input type="checkbox" onclick="t()">Show
+<script>
+class Pass{
+toggle(f){f.type=(f.type=="password")?"text":"password";}
+}
+let obj=new Pass();
+function t(){obj.toggle(p);}
+</script>
+</body>
+</html>
+
+
+========================================
+8. Email Validator
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+</style>
+</head>
+<body>
+<h2>Email</h2>
+<input id="e">
+<button onclick="v()">Check</button>
+<p id="m"></p>
+<script>
+function v(){
+try{
+let x=e.value;
+if(!x) throw "Empty";
+if(x.includes(" ")) throw "No spaces";
+if(!x.includes("@")||!x.includes(".")) throw "Invalid";
+if(!(x.endsWith(".com")||x.endsWith(".in"))) throw "Domain";
+m.innerText="Valid";
+}catch(err){m.innerText=err;}
+}
+</script>
+</body>
+</html>
+
+
+========================================
+9. Date Difference
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+</style>
+</head>
+<body>
+<input type="date" id="d1">
+<input type="date" id="d2">
+<button onclick="c()">Calc</button>
+<p id="r"></p>
+<script>
+function c(){
+try{
+let a=new Date(d1.value);
+let b=new Date(d2.value);
+if(a>b) throw "Invalid";
+let diff=(b-a)/(1000*60*60*24);
+r.innerText="Days:"+diff;
+}catch(e){r.innerText=e;}
+}
+</script>
+</body>
+</html>
+
+
+========================================
+10. Todo List
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+</style>
+</head>
+<body>
+<input id="t1">
+<button onclick="add()">Add</button>
+<button onclick="show()">Show</button>
+<p id="o"></p>
+<script>
+let a=[];
+function add(){
+if(t1.value==""){o.innerText="Empty";return;}
+a.push(t1.value);
+t1.value="";
+}
+function show(){
+o.innerHTML=a.join("<br>");
+}
+</script>
+</body>
+</html>
+
+
+========================================
+11. Palindrome
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<input id="s">
+<button onclick="c()">Check</button>
+<p id="r"></p>
+<script>
+function c(){
+try{
+let x=s.value.toLowerCase().replaceAll(" ","");
+if(!x) throw "Empty";
+let rev=x.split("").reverse().join("");
+r.innerText=(x==rev)?"Palindrome":"Not";
+}catch(e){r.innerText=e;}
+}
+</script>
+</body>
+</html>
+
+
+========================================
+12. Form Validation
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{text-align:center;font-family:Arial}
+input{margin:5px;padding:5px}
+</style>
+</head>
+<body>
+<input id="n" placeholder="Name"><br>
+<input id="age" placeholder="Age"><br>
+<p id="e"></p>
+<script>
+n.onblur=function(){
+if(n.value.length<3)e.innerText="Invalid Name";
+};
+age.onblur=function(){
+if(age.value<18||age.value>100)e.innerText="Invalid Age";
+};
+</script>
+</body>
+</html>
+
+
+========================================
+13. Array Filter Map
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<input id="i">
+<button onclick="p()">Process</button>
+<p id="o"></p>
+<script>
+function p(){
+try{
+let arr=i.value.split(",");
+let num=arr.filter(x=>!isNaN(x));
+let res=num.map(x=>x*2);
+o.innerText=res.join(",");
+}catch(e){o.innerText="Error";}
+}
+</script>
+</body>
+</html>
+
+
+========================================
+14. Countdown Timer
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<input type="date" id="d">
+<button onclick="start()">Start</button>
+<p id="o"></p>
+<script>
+function start(){
+let t=new Date(d.value);
+setInterval(()=>{
+let now=new Date();
+let diff=t-now;
+if(diff<0){o.innerText="Past";return;}
+let sec=Math.floor(diff/1000);
+o.innerText=sec+" sec left";
+},1000);
+}
+</script>
+</body>
+</html>
+
+
+========================================
+15. Student Array
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<button onclick="show()">Show</button>
+<p id="o"></p>
+<script>
+let s=[
+{name:"A",marks:80},
+{name:"B",marks:60},
+{name:"C",marks:90}
+];
+function show(){
+o.innerHTML=s.map(x=>x.name+" "+x.marks).join("<br>");
+}
+</script>
+</body>
+</html>
+
+
+========================================
+16. Word Counter
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<textarea id="t"></textarea><br>
+<button onclick="c()">Count</button>
+<p id="o"></p>
+<script>
+function c(){
+try{
+let txt=t.value;
+if(!txt) throw "Empty";
+let words=txt.split(" ").filter(x=>x!="");
+o.innerText="Words:"+words.length+" Chars:"+txt.length;
+}catch(e){o.innerText=e;}
+}
+</script>
+</body>
+</html>
+
+
+========================================
+17. Age Calculator
+========================================
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{text-align:center;font-family:Arial}</style>
+</head>
+<body>
+<input type="date" id="b">
+<button onclick="c()">Age</button>
+<p id="o"></p>
+<script>
+function c(){
+try{
+let d=new Date(b.value);
+let now=new Date();
+if(d>now) throw "Future";
+let age=now.getFullYear()-d.getFullYear();
+o.innerText="Age:"+age;
+}catch(e){o.innerText=e;}
+}
+</script>
+</body>
+</html>
