@@ -1,0 +1,31 @@
+| Task No. | Task / Component                          | Start Week | Duration (Weeks) |
+| -------- | ----------------------------------------- | ---------- | ---------------- |
+| 1        | Project Planning                          | 1          | 1                |
+| 1.1      | Project Planning & Scheduling             | 1          | 1                |
+| 1.2      | Resource Allocation                       | 1          | 1                |
+| 2        | Requirement Analysis                      | 2          | 2                |
+| 2.1      | Stakeholder Meetings                      | 2          | 1                |
+| 2.2      | Requirement Gathering                     | 2          | 1                |
+| 2.3      | SRS Documentation (IEEE 830)              | 3          | 1                |
+| 3        | System Design                             | 4          | 2                |
+| 3.1      | Database Schema Design (SQLite/CSV)       | 4          | 1                |
+| 3.2      | UI/UX Wireframing (Bootstrap Layouts)     | 4          | 1                |
+| 3.3      | Eligibility Engine Design                 | 5          | 1                |
+| 4        | Development                               | 6          | 4                |
+| 4.1      | Frontend Development (HTML/CSS/Bootstrap) | 6          | 2                |
+| 4.2      | Backend Development (Flask/Python)        | 7          | 2                |
+| 4.3      | File Upload Module Integration            | 8          | 1                |
+| 4.4      | Database Integration                      | 9          | 1                |
+| 5        | Testing                                   | 10         | 2                |
+| 5.1      | Unit Testing                              | 10         | 1                |
+| 5.2      | Integration Testing                       | 10         | 1                |
+| 5.3      | Security Testing                          | 11         | 1                |
+| 5.4      | Performance Testing                       | 11         | 1                |
+| 6        | Deployment                                | 12         | 1                |
+| 6.1      | Server Configuration                      | 12         | 1                |
+| 6.2      | Flask Deployment                          | 12         | 1                |
+| 6.3      | User Documentation                        | 12         | 1                |
+| 7        | Maintenance                               | 13         | 2                |
+| 7.1      | Bug Fixing                                | 13         | 1                |
+| 7.2      | Scheme Database Updates                   | 14         | 1                |
+| 7.3      | Multilingual Support Planning             | 14         | 1                |
