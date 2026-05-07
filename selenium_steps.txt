@@ -1,0 +1,38 @@
+# Import webdriver to control the browser
+from selenium import webdriver
+
+# Import By to locate elements on the webpage
+from selenium.webdriver.common.by import By
+
+# Import Keys to simulate keyboard actions
+from selenium.webdriver.common.keys import Keys
+
+# Import Service to specify ChromeDriver path
+from selenium.webdriver.chrome.service import Service
+
+# Import time to pause execution
+import time
+
+# Set the path of ChromeDriver executable
+service = Service(r'C:\Users\harsh\Downloads\chromedriver-win64\chromedriver.exe')
+
+# Launch Chrome browser using WebDriver
+driver = webdriver.Chrome(service=service)
+
+# Open Google website
+driver.get("https://www.google.com")
+
+# Locate the search box using name attribute 'q'
+search_box = driver.find_element(By.NAME, 'q')
+
+# Type 'Selenium' in the search box
+search_box.send_keys('Selenium')
+
+# Press Enter key to perform search
+search_box.send_keys(Keys.RETURN)
+
+# Wait for 5 seconds to see the result
+time.sleep(100)
+
+# Close the browser
+driver.quit()
